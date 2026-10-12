@@ -1,10 +1,11 @@
 # Public distribution provenance
 
-Executable source: https://registry.npmjs.org/@wan27/cli/0.1.2
+Published release: https://registry.npmjs.org/@wan27/cli/0.1.3
 
 Updated: 2026-10-12
 
-The executable is byte-identical to the 0.1.1 and 0.1.2 public npm releases.
+The 0.1.3 npm tarball was downloaded and verified. Its executable is byte-identical
+to the 0.1.1 and 0.1.2 public npm releases.
 Version 0.1.3 updates the GitHub repository and MCP Registry namespace to
 NotUsingGithub. No hosted website source or previous Git history is included.
 
