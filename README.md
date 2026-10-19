@@ -118,3 +118,22 @@ node dist/cli.mjs mcp
 MIT. See [PROVENANCE.md](PROVENANCE.md) for release provenance.
 The executable is unchanged from 0.1.1. Version 0.1.3 updates the GitHub repository
 and MCP Registry namespace to the NotUsingGithub account.
+
+## Container for directory introspection
+
+```sh
+docker build -t wan27-mcp .
+docker run --rm -i wan27-mcp
+```
+
+The container runs the same pinned client distribution as the npm package,
+with the required `mcp` subcommand, as a non-root user. Linux containers explicitly select the private-file credential
+store because macOS Keychain is unavailable there; the empty container has no
+credentials. It accepts MCP JSON-RPC
+on stdin and writes protocol responses on stdout. MCP initialization and
+`tools/list` do not require an account or token and do not create media or spend
+credits. Calling account or generation tools requires an authorized Wan27
+account; generation still requires a paid subscription and spends website credits.
+
+The build copies only the distribution and public metadata. No credentials or
+host configuration are included. Do not embed a token in the Dockerfile or image.
