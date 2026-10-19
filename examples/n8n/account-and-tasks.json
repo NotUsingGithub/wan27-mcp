@@ -1,0 +1,189 @@
+{
+  "id": "wan27AccountTasksReport",
+  "name": "Review Wan27 credits and recent generation tasks",
+  "nodes": [
+    {
+      "id": "f4a173fd-a263-4ee4-a451-3d95a169be26",
+      "name": "Run report",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "20afe561-e558-4a56-94ac-9325f5c59897",
+      "name": "Read account",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        240,
+        0
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://wan2-7.io/api/v1/account/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Wan27-Client-Mode",
+              "value": "cli"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000,
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "8e2d31b4-f199-4736-8d3e-09d267097e43",
+      "name": "Read recent tasks",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        0
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://wan2-7.io/api/v1/tasks/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Wan27-Client-Mode",
+              "value": "cli"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000,
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "limit",
+              "value": "20"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "c58f3dde-2ce7-4331-abde-162fc34c1aa1",
+      "name": "Account and task report",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        720,
+        0
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3cf08ede-84ac-4fd0-b73e-aad8d177eef3",
+              "name": "report",
+              "type": "object",
+              "value": "={{ { checkedAt: $now.toISO(), account: $(\"Read account\").first().json, statusCounts: $json.tasks.reduce((counts, task) => ({ ...counts, [String(task.status || \"unknown\")]: (counts[String(task.status || \"unknown\")] || 0) + 1 }), {}), hasMore: Boolean($json.nextCursor), tasks: $json } }}"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "1828b491-9080-4247-a3d6-6dc9633850bc",
+      "name": "Setup instructions",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -680
+      ],
+      "parameters": {
+        "content": "## Review Wan27 credits and recent generation tasks\n\n### Who this is for\nFor creators and operators who use Wan27 for image or video generation and want to check their remaining credits and recent task outcomes from n8n before starting another batch.\n\n### What it does\nThe workflow reads account status, retrieves the latest 20 tasks, and builds one timestamped report with account details, task status counts, original task records, and an indicator that more history is available. It only makes GET requests: no media generation, purchases, or credit spending occurs. A failed authentication or service response stops the workflow instead of producing a misleading empty report.\n\n### Set up\nImport the JSON. Create an HTTP Header Auth credential with header name `Authorization` and value `Bearer ` followed by your existing Wan27 access token. Select that credential in both HTTP Request nodes. Do not paste a real token into the workflow JSON or sticky note. Execute manually and open the final report node.\n\n### Requirements and customization\nYou need your own n8n instance and eligible Wan27 API access. Adjust the task limit between 1 and 50; this is a one-page report, not a complete historical audit. Requests have a 30-second timeout and reject redirects. Configure n8n execution retention because task data can include media URLs.\n\nSetup documentation: https://wan2-7.io/mcp/guide/\n",
+        "width": 920,
+        "height": 640
+      }
+    }
+  ],
+  "connections": {
+    "Run report": {
+      "main": [
+        [
+          {
+            "node": "Read account",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read account": {
+      "main": [
+        [
+          {
+            "node": "Read recent tasks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read recent tasks": {
+      "main": [
+        [
+          {
+            "node": "Account and task report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "tags": []
+}

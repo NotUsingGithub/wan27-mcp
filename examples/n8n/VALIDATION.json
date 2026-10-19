@@ -1,0 +1,15 @@
+{
+  "result": "passed",
+  "engineImage": "docker.n8n.io/n8nio/n8n@sha256:3db21366be1d3c77c1708963129c051948573019659e8873e0294be035ffc1b2",
+  "network": "none",
+  "credential": "dummy fixture only",
+  "imported": true,
+  "executed": true,
+  "liveApiCalls": 0,
+  "paidGenerationCalls": 0,
+  "statusCounts": {
+    "succeeded": 1,
+    "processing": 1,
+    "failed": 1
+  }
+}
